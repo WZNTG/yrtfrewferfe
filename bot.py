@@ -8,7 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import yt_dlp
 
 # --- КОНФИГУРАЦИЯ ---
-BOT_TOKEN = "8785733228:AAF4XxBbhQTG6K-ibhc4yR_5c5BBgvRIAnA"  # <-- Вставь свой токен
+BOT_TOKEN = "8785733228:AAFuSfyvY8vFsN9TzCH1Ix2sfmCMv_hcUNE"  # <-- Вставь свой токен
 ADMIN_ID = 5394084759
 USERS_FILE = "users.txt"
 DOWNLOAD_DIR = "downloads"
