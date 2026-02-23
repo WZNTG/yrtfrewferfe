@@ -1,5 +1,4 @@
-aiogram>=3.4.1
-yt-dlp>=2025.01.15
-aiohttp>=3.9.0
-certifi>=2024.02.02
-urllib3>=2.2.0
+pyrogram
+tgcrypto
+yt-dlp
+static-ffmpeg
