@@ -3,3 +3,4 @@ tgcrypto
 yt-dlp
 static-ffmpeg
 python-dotenv
+shazamio
