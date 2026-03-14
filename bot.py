@@ -127,10 +127,17 @@ def dl_search_yt(query: str, quality_key: str) -> tuple:
     opts = _ydl_opts(fmt, is_audio)
     opts["default_search"] = "ytsearch"
     opts["max_downloads"]  = 1
+    info = None
     with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(query, download=True)
+        try:
+            info = ydl.extract_info(query, download=True)
+        except yt_dlp.utils.MaxDownloadsReached:
+            pass  # норма
+        if info is None:
+            raise RuntimeError("Не удалось получить информацию о видео")
         if "entries" in info and info["entries"]:
             vid_id = info["entries"][0].get("id", "")
+            info   = info["entries"][0]
         else:
             vid_id = info.get("id", "")
         filename, title, duration = _extract(info, ydl, is_audio)
@@ -142,8 +149,14 @@ def dl_soundcloud(query: str) -> tuple:
     opts = _ydl_opts("bestaudio/best", is_audio=True)
     opts["default_search"] = "scsearch"
     opts["max_downloads"]  = 1
+    info = None
     with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.extract_info(query, download=True)
+        try:
+            info = ydl.extract_info(query, download=True)
+        except yt_dlp.utils.MaxDownloadsReached:
+            pass  # норма — файл уже скачан, лимит 1 сработал
+        if info is None:
+            raise RuntimeError("Не удалось получить информацию о треке")
         if "entries" in info and info["entries"]:
             info = info["entries"][0]
         filename = os.path.splitext(ydl.prepare_filename(info))[0] + ".mp3"
@@ -159,7 +172,8 @@ def dl_soundcloud(query: str) -> tuple:
 def friendly_error(e: Exception) -> str:
     s = str(e)
     low = s.lower()
-    if "not supported between" in low:   return "🔧 Ошибка форматов yt-dlp — попробуй другое качество"
+    if "maximum number of downloads" in low: return "🔧 Внутренняя ошибка лимита — попробуй ещё раз"
+    if "not supported between"       in low: return "🔧 Ошибка форматов yt-dlp — попробуй другое качество"
     if "private video"         in low:   return "🔒 Видео приватное"
     if "members-only"          in low:   return "👥 Только для участников канала"
     if "age" in low and "restrict" in low: return "🔞 Возрастное ограничение"
