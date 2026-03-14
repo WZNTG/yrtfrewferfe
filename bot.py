@@ -144,7 +144,7 @@ def dl_search_yt(query: str, quality_key: str) -> tuple:
         return filename, title, duration, f"https://youtu.be/{vid_id}"
 
 
-def dl_soundcloud(query: str) -> tuple:
+def dl_music_yt(query: str) -> tuple:
     """Найти трек на YouTube и скачать как MP3."""
     opts = _ydl_opts("bestaudio/best", is_audio=True)
     opts["default_search"] = "ytsearch"
@@ -160,11 +160,17 @@ def dl_soundcloud(query: str) -> tuple:
         if "entries" in info and info["entries"]:
             info = info["entries"][0]
         filename = os.path.splitext(ydl.prepare_filename(info))[0] + ".mp3"
+        artist = (
+            info.get("artist") or
+            info.get("creator") or
+            info.get("uploader") or
+            ""
+        )
         return (
             filename,
             info.get("title", "Без названия"),
             info.get("duration", 0),
-            info.get("uploader", ""),
+            artist,
         )
 
 
@@ -266,7 +272,7 @@ async def process_download(client: Client, status: Message,
         elif mode == "yt":
             if is_audio:
                 fp, title, duration, artist = await loop.run_in_executor(
-                    None, dl_soundcloud, target
+                    None, dl_music_yt, target
                 )
             else:
                 fp, title, duration, yt_url = await loop.run_in_executor(
@@ -398,7 +404,7 @@ async def on_message(client: Client, message: Message):
         timer = asyncio.create_task(progress_timer(status, "Скачиваю трек...", stop))
         try:
             loop = asyncio.get_running_loop()
-            fp, title, duration, artist = await loop.run_in_executor(None, dl_soundcloud, q)
+            fp, title, duration, artist = await loop.run_in_executor(None, dl_music_yt, q)
             stop.set(); await timer
 
             await status.edit_text("📤 **Отправляю трек...**")
