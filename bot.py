@@ -145,9 +145,9 @@ def dl_search_yt(query: str, quality_key: str) -> tuple:
 
 
 def dl_soundcloud(query: str) -> tuple:
-    """Найти трек на SoundCloud и скачать как MP3."""
+    """Найти трек на YouTube и скачать как MP3."""
     opts = _ydl_opts("bestaudio/best", is_audio=True)
-    opts["default_search"] = "scsearch"
+    opts["default_search"] = "ytsearch"
     opts["max_downloads"]  = 1
     info = None
     with yt_dlp.YoutubeDL(opts) as ydl:
